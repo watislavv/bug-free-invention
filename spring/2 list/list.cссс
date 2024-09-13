@@ -1,0 +1,133 @@
+/* - Реализуйте следующие функции для работы со списком:
+     - void list_push_front(struct ListStruct *, int value);
+     - void list_push_back(struct ListStruct *, int value);
+     - void list_push(struct ListStruct *, struct ListNode *, int value);
+     - void list_pop(struct ListStruct *, struct ListNode *);
+     - int list_count(struct ListStruct *);
+     - struct ListNode *list_get_head(struct ListStruct *);
+     - struct ListNode *list_get_tail(struct ListStruct *);
+     - bool list_is_empty(struct ListStruct *);
+     - void list_sort(struct ListStruct *); */
+
+#include <stdlib.h>
+#include "list.h"
+
+// Инициализация списка
+void list_init(struct ListStruct *list) {
+    list->head = NULL;
+    list->tail = NULL;
+}
+
+// Освобождение памяти
+void list_destroy(struct ListStruct *list) {
+    struct ListNode *current = list->head;
+    while (current != NULL) {
+        struct ListNode *next = current->next;
+        free(current);
+        current = next;
+    }
+    list->head = NULL;
+    list->tail = NULL;
+}
+
+// Добавление в начало
+void list_push_front(struct ListStruct *list, int value) {
+    struct ListNode *new_node = (struct ListNode *)malloc(sizeof(struct ListNode));
+    new_node->data = value;
+    new_node->prev = NULL;
+    new_node->next = list->head;
+
+    if (list->head != NULL) {
+        list->head->prev = new_node;
+    } else {
+        list->tail = new_node; // Если список был пуст
+    }
+
+    list->head = new_node;
+}
+
+// Добавление в конец
+void list_push_back(struct ListStruct *list, int value) {
+    struct ListNode *new_node = (struct ListNode *)malloc(sizeof(struct ListNode));
+    new_node->data = value;
+    new_node->next = NULL;
+    new_node->prev = list->tail;
+
+    if (list->tail != NULL) {
+        list->tail->next = new_node;
+    } else {
+        list->head = new_node; // Если список был пуст
+    }
+
+    list->tail = new_node;
+}
+
+// Удаление указанного узла
+void list_pop(struct ListStruct *list, struct ListNode *node) {
+    if (node == NULL) return;
+
+    if (node->prev != NULL) {
+        node->prev->next = node->next;
+    } else {
+        list->head = node->next; // Если удаляем голову
+    }
+
+    if (node->next != NULL) {
+        node->next->prev = node->prev;
+    } else {
+        list->tail = node->prev; // Если удаляем хвост
+    }
+
+    free(node);
+}
+
+// Подсчет узлов
+int list_count(struct ListStruct *list) {
+    int count = 0;
+    struct ListNode *current = list->head;
+
+    while (current != NULL) {
+        count++;
+        current = current->next;
+    }
+
+    return count;
+}
+
+// Получение первого узла
+struct ListNode *list_get_head(struct ListStruct *list) {
+    return list->head;
+}
+
+// Получение последнего узла
+struct ListNode *list_get_tail(struct ListStruct *list) {
+    return list->tail;
+}
+
+// Проверка на пустоту
+bool list_is_empty(struct ListStruct *list) {
+    return list->head == NULL;
+}
+
+// Сортировка (например, пузырьком)
+void list_sort(struct ListStruct *list) {
+    if (list_is_empty(list)) return;
+
+    bool swapped;
+    do {
+        swapped = false;
+        struct ListNode *current = list->head;
+
+        while (current != NULL && current->next != NULL) {
+            if (current->data > current->next->data) {
+                // Меняем местами данные
+                int temp = current->data;
+                current->data = current->next->data;
+                current->next->data = temp;
+
+                swapped = true;
+            }
+            current = current->next;
+        }
+    } while (swapped);
+}

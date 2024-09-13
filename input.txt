@@ -1,0 +1,5 @@
+push_front 10
+push_back 20
+count
+head
+is_empty
